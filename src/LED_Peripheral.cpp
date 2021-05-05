@@ -109,7 +109,9 @@ void LED_accel_rainbow() {
 // END OF LED_accel_rainbow()
 
 void LED_POV(POV_Pattern &pattern) {
+
   static uint32_t column{0};
+
   for (int i = 0; i < pattern._height; ++i) {
 
     uint32_t offset = 3 * (i + column * pattern._height);
@@ -117,14 +119,15 @@ void LED_POV(POV_Pattern &pattern) {
     leds[i].green = pattern._img[offset + 1];
     leds[i].red = pattern._img[offset + 2];
 
-    // Serial.print("B");
-    // Serial.print(_img[i_offset]);
-    // Serial.print(" G");
-    // Serial.print(_img[i_offset + 1]);
-    // Serial.print(" R");
-    // Serial.println(_img[i_offset + 2]);
-    // Serial.print(" ");
+    Serial.print("B");
+    Serial.print(pattern._img[offset]);
+    Serial.print(" G");
+    Serial.print(pattern._img[offset + 1]);
+    Serial.print(" R");
+    Serial.println(pattern._img[offset + 2]);
+    Serial.print(" ");
   }
+
   column = (column + 1) % pattern._width;
 
   FastLED.show();

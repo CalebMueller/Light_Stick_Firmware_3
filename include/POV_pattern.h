@@ -1,25 +1,22 @@
 #ifndef POV_PATTERN_H
 #define POV_PATTERN_H
 
-#include "FS.h"
-#include "SPIFFS.h"
+#include "ESP_SPI_FS.h"
+#include <stdio.h>
+
+#include "Pattern.h"
 #include <Arduino.h>
 #include <vector>
 
-typedef unsigned int int32;
-typedef short int16;
-typedef unsigned char byte;
-
-class POV_Pattern {
+class POV_Pattern : public Pattern {
 public:
   POV_Pattern(const char *fileName);
-
+  POV_Pattern(const byte *fileName[]);
   ~POV_Pattern() { Serial.println("POV_Pattern destructor called"); };
 
   void print_img_info();
-  void show();
-  void ReadImage(const char *fileName, byte **pixels, int32 *width,
-                 int32 *height, int32 *bytesPerPixel);
+  void run();
+
   friend void LED_POV(POV_Pattern &pattern);
 
 private:
