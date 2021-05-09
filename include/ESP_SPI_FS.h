@@ -3,6 +3,11 @@
 
 #include "esp_spiffs.h"
 #include <Arduino.h>
+#include <math.h>
+
+#include <dirent.h>
+#include <stdio.h>
+#include <string.h>
 
 // Might not need these, keeping around just in case
 //**originally from esp_spiffs example file
@@ -21,5 +26,7 @@ void esp_spiffs_disable();
 
 void ReadImage(const char *fileName, byte **pixels, int32 *width, int32 *height,
                int32 *bytesPerPixel);
+
+void show_dir_content(char *path);
 
 #endif // ESP_SPI_FS_H

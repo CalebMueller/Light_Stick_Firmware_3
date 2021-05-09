@@ -64,15 +64,47 @@ void ReadImage(const char *fileName, byte **pixels, int32 *width, int32 *height,
       (int)(4 * ceil((float)(*width) / 4.0f)) * (*bytesPerPixel);
   int unpaddedRowSize = (*width) * (*bytesPerPixel);
   int totalSize = unpaddedRowSize * (*height);
-  *pixels = (byte *)malloc(totalSize);
-  int i = 0;
-  byte *currentRowPointer = *pixels + ((*height - 1) * unpaddedRowSize);
-  for (i = 0; i < *height; i++) {
+  *pixels = (byte *)calloc(totalSize, sizeof(byte));
+
+  // byte *currentRowPointer = *pixels + ((*height - 1) * unpaddedRowSize);
+  // for (i = 0; i < *height; i++) {
+  //   fseek(imageFile, dataOffset + (i * paddedRowSize), SEEK_SET);
+  //   fread(currentRowPointer, 1, unpaddedRowSize, imageFile);
+  //   currentRowPointer -= unpaddedRowSize;
+  // }
+
+  // byte *currentRowPointer = *pixels + ((*height - 1) * unpaddedRowSize);
+  for (int i = 0; i < *height; i++) {
+    byte *currentRowPointer = *pixels + ((*height - 1 - i) * unpaddedRowSize);
     fseek(imageFile, dataOffset + (i * paddedRowSize), SEEK_SET);
     fread(currentRowPointer, 1, unpaddedRowSize, imageFile);
-    currentRowPointer -= unpaddedRowSize;
   }
 
   esp_spiffs_disable();
   fclose(imageFile);
-} // end of ReadImage()
+}
+// end of ReadImage()
+/////////////////////////////////////////////////////////////////////////////////
+
+void show_dir_content(char *path) {
+  // recursive function to print the content of a given folder
+  DIR *d = opendir(path); // open the path
+  if (d == NULL)
+    return;           // if was not able return
+  struct dirent *dir; // for the directory entries
+  while ((dir = readdir(d)) !=
+         NULL) // if we were able to read somehting from the directory
+  {
+    if (dir->d_type !=
+        DT_DIR) // if the type is not directory print it to serial monitor
+      Serial.println(dir->d_name);
+    else if (dir->d_type == DT_DIR && strcmp(dir->d_name, ".") != 0 &&
+             strcmp(dir->d_name, "..") != 0) // if it is a directory
+    {
+      char d_path[255]; // here I am using sprintf which is safer than strcat
+      sprintf(d_path, "%s/%s", path, dir->d_name);
+      show_dir_content(d_path); // recall with the new path
+    }
+  }
+  closedir(d); // finally close the directory
+}

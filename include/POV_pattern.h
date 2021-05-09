@@ -14,12 +14,15 @@ public:
   POV_Pattern(const byte *fileName[]);
   ~POV_Pattern() { Serial.println("POV_Pattern destructor called"); };
 
-  void print_img_info();
-  void run();
+  void SetName(const char *fileName); // parses pattern name from fileName
+  void PrintImgInfo();
+  void PrintImgInfo(bool verbose);
+  void Run();
 
   friend void LED_POV(POV_Pattern &pattern);
 
 private:
+  std::string _name{"empty"};
   uint32_t _width{0};
   uint32_t _height{0};
   std::vector<byte> _img; // Blue-Green-Red member sequence

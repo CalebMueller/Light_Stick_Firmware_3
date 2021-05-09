@@ -24,10 +24,10 @@ Pin	        Net
 #include "Sleep.h"
 #include <Arduino.h>
 
-std::vector<int> testVector;
+#define FILEPATH "/spiffs"
 
 void setup() {
-  // Serial.begin(115200);
+  Serial.begin(115200);
 
   sleep_setup();
   powerManagement_setup();
@@ -35,31 +35,10 @@ void setup() {
   button_setup();
   LED_cycleBrightness();
   LED_startup_animation();
-  mpu_setup(8, 500, 44); // setup last because chip is slow to power on
+  mpu_setup(8, 500, 44); // setup last because mpu chip is slow to power on
 
-  /////////////////////////////////////////////////////////////////////
-  // debug development stuff
-
-  // POV_Pattern *test4;
-  // test4 = new POV_Pattern("/spiffs/my_skull.bmp");
-  // test4->print_img_info();
-
-  // for (int i = 0; i < 50; ++i) {
-  //   delay(5000);
-  //   test4->show();
-  //   Serial.println();
-  // }
-
-  // while (1) {
-  //   static NoBlockTimer t;
-  //   if (t.timer(3)) {
-  //     test4->show();
-  //   }
-  // }
-
-  // sleep();
-  // debug development stuff
-  /////////////////////////////////////////////////////////////////////
+  esp_spiffs_enable();
+  show_dir_content(FILEPATH);
 
 } // END OF setup()
 
