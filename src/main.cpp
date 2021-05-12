@@ -24,21 +24,22 @@ Pin	        Net
 #include "Sleep.h"
 #include <Arduino.h>
 
+#include "POV_pattern.h"
+
 #define FILEPATH "/spiffs"
+#define FILEPATH_POV "/spiffs/pov"
 
 void setup() {
   Serial.begin(115200);
 
-  sleep_setup();
   powerManagement_setup();
+  sleep_setup();
   LED_Peripheral_setup();
   button_setup();
   LED_cycleBrightness();
   LED_startup_animation();
   mpu_setup(8, 500, 44); // setup last because mpu chip is slow to power on
-
   esp_spiffs_enable();
-  show_dir_content(FILEPATH);
 
 } // END OF setup()
 

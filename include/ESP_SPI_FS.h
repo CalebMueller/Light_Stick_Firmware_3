@@ -3,18 +3,13 @@
 
 #include "esp_spiffs.h"
 #include <Arduino.h>
-#include <math.h>
 
 #include <dirent.h>
 #include <stdio.h>
 #include <string.h>
 
-// Might not need these, keeping around just in case
-//**originally from esp_spiffs example file
-//#include <sys/unistd.h>
-//#include "esp_err.h"
-//#include "esp_log.h"
-//#include <sys/stat.h>
+//#include <string>
+#include <vector>
 
 typedef unsigned int int32;
 typedef short int16;
@@ -28,5 +23,6 @@ void ReadImage(const char *fileName, byte **pixels, int32 *width, int32 *height,
                int32 *bytesPerPixel);
 
 void show_dir_content(char *path);
+std::vector<std::string> get_dir_content(const char *path);
 
 #endif // ESP_SPI_FS_H

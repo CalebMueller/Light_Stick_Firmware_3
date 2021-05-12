@@ -13,24 +13,28 @@ POV_Pattern::POV_Pattern(const char *fileName) {
 
   ReadImage(fileName, &pixels, &width, &height, &bytesPerPixel);
 
+  // for (int i = 0; i < ((height) * (width) * (bytesPerPixel)); i += 3) {
+  //   Serial.print("(");
+  //   Serial.print(byte(pixels[i]));
+  //   Serial.print(" ");
+  //   Serial.print(byte(pixels[i + 1]));
+  //   Serial.print(" ");
+  //   Serial.print(byte(pixels[i + 2]));
+  //   Serial.print(") ");
+  // }
+
   SetName(fileName);
   _width = width;
   _height = height;
-  _img = std::vector<byte>(_height * _width * bytesPerPixel);
+  _img = std::vector<byte>(height * width * bytesPerPixel);
 
-  for (int i = 0; i < _width; ++i) {
-    for (int j = 0; j < (_height - 1); j++) {
-
-      uint16_t a = bytesPerPixel * (i + j * _height);
-      uint16_t b = bytesPerPixel * (j + i * _width);
-
+  for (int column = 0; column < width; ++column) {
+    for (int row = 0; row < height; ++row) {
+      uint32_t a = bytesPerPixel * (row + column * height);
+      uint32_t b = bytesPerPixel * (column + row * width);
       _img[a] = pixels[b];
       _img[a + 1] = pixels[b + 1];
       _img[a + 2] = pixels[b + 2];
-
-      // _img.push_back(pixels[3 * (i + j)]);
-      // _img.push_back(pixels[3 * (i + j) + 1]);
-      // _img.push_back(pixels[3 * (i + j) + 2]);
     }
   }
 
@@ -40,25 +44,25 @@ POV_Pattern::POV_Pattern(const char *fileName) {
 // END OF POV_Pattern constructor
 ///////////////////////////////////////////////////////////////////////////
 
-void POV_Pattern::PrintImgInfo() {
-  Serial.print("\n");
-  Serial.printf("%s's img info: width: %dheight: %d\n", _name.c_str(), _width,
-                _height);
-} // end default PrintImgInfo()
 void POV_Pattern::PrintImgInfo(bool verbose) {
-  Serial.print("\n");
-  Serial.printf("%s's img info: width: %dheight: %d\n", _name.c_str(), _width,
+  Serial.printf("%s's _img info: width: %d height: %d\n", _name.c_str(), _width,
                 _height);
+
   if (verbose) {
-    Serial.printf("POV Pattern's height=%d, width=%d \n", _height, _width);
-    for (int i = 0; i < _img.size(); ++i) {
-      Serial.print(_img[i]);
-      Serial.print(", ");
+    // print out _img Data
+    for (int row = 0; row < _height; ++row) {
+      for (int column = 0; column < _width; ++column) {
+        uint32_t offset = 3 * (_height * column + row);
+
+        Serial.printf("(%d,%d,%d) ", _img[offset], _img[offset + 1],
+                      _img[offset + 2]);
+      }
+      Serial.println();
     }
     Serial.print("\n\n");
   }
-} // end overloaded PrintImgInfo(bool)
-// END OF POV_Pattern::print_img() and print_image(bool verbose)
+}
+// END OF POV_Pattern::PrintImgInfo(bool)
 ///////////////////////////////////////////////////////////////////////////
 
 void POV_Pattern::Run() { LED_POV(*this); }
@@ -68,7 +72,7 @@ void POV_Pattern::Run() { LED_POV(*this); }
 void POV_Pattern::SetName(const char *fileName) {
   // parses pattern name from fileName and assigns to member _name
   std::string str(fileName);
-  std::size_t s_pos = str.find("/spiffs/") + size_t(8);
+  std::size_t s_pos = str.find("/spiffs/pov/") + size_t(12);
   // truncate ".bmp"
   std::size_t span = str.length() - s_pos - 4;
   _name = str.substr(s_pos, span);

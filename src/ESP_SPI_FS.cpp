@@ -21,7 +21,7 @@ void esp_spiffs_enable() {
   }
   size_t total = 0, used = 0;
   ret = esp_spiffs_info(NULL, &total, &used);
-  Serial.printf("Partition size: total: %d, used: %d", total, used);
+  Serial.printf("Partition size: total: %d, used: %d \n", total, used);
 } // end of esp_spiffs_enable()
 ///////////////////////////////////////////////////////////////////////////
 
@@ -37,15 +37,9 @@ void esp_spiffs_disable() {
 #define WIDTH_OFFSET 0x0012
 #define HEIGHT_OFFSET 0x0016
 #define BITS_PER_PIXEL_OFFSET 0x001C
-#define HEADER_SIZE 14
-#define INFO_HEADER_SIZE 40
-#define NO_COMPRESION 0
-#define MAX_NUMBER_OF_COLORS 0
-#define ALL_COLORS_REQUIRED 0
+
 void ReadImage(const char *fileName, byte **pixels, int32 *width, int32 *height,
                int32 *bytesPerPixel) {
-
-  esp_spiffs_enable();
 
   FILE *imageFile = fopen(fileName, "rb");
   int32 dataOffset;
@@ -60,27 +54,18 @@ void ReadImage(const char *fileName, byte **pixels, int32 *width, int32 *height,
   fread(&bitsPerPixel, 2, 1, imageFile);
   *bytesPerPixel = ((int32)bitsPerPixel) / 8;
 
-  int paddedRowSize =
-      (int)(4 * ceil((float)(*width) / 4.0f)) * (*bytesPerPixel);
+  int paddedRowSize = (((*width) * (*bytesPerPixel) + 3) / 4) * 4;
   int unpaddedRowSize = (*width) * (*bytesPerPixel);
   int totalSize = unpaddedRowSize * (*height);
-  *pixels = (byte *)calloc(totalSize, sizeof(byte));
 
-  // byte *currentRowPointer = *pixels + ((*height - 1) * unpaddedRowSize);
-  // for (i = 0; i < *height; i++) {
-  //   fseek(imageFile, dataOffset + (i * paddedRowSize), SEEK_SET);
-  //   fread(currentRowPointer, 1, unpaddedRowSize, imageFile);
-  //   currentRowPointer -= unpaddedRowSize;
-  // }
+  *pixels = (byte *)malloc(totalSize);
+  byte *currentRowPointer = *pixels + ((*height - 1) * unpaddedRowSize);
 
-  // byte *currentRowPointer = *pixels + ((*height - 1) * unpaddedRowSize);
-  for (int i = 0; i < *height; i++) {
-    byte *currentRowPointer = *pixels + ((*height - 1 - i) * unpaddedRowSize);
+  for (int i = 0; i <= *height; ++i) {
     fseek(imageFile, dataOffset + (i * paddedRowSize), SEEK_SET);
     fread(currentRowPointer, 1, unpaddedRowSize, imageFile);
+    currentRowPointer -= unpaddedRowSize;
   }
-
-  esp_spiffs_disable();
   fclose(imageFile);
 }
 // end of ReadImage()
@@ -108,3 +93,29 @@ void show_dir_content(char *path) {
   }
   closedir(d); // finally close the directory
 }
+// end of show_dir_contents()
+//////////////////////////////////////////////////////////////////////////////////
+
+std::vector<std::string> get_dir_content(const char *path) {
+  // returns a string vector containing the contents of the directory
+
+  std::vector<std::string> contents;
+
+  DIR *d = opendir(path); // open the path
+  if (d == NULL)
+    return contents; // if was not able return
+
+  struct dirent *dir; // for the directory entries
+  while ((dir = readdir(d)) !=
+         NULL) // if we were able to read somehting from the directory
+  {
+    if (dir->d_type != DT_DIR) {
+      std::string entry(dir->d_name);
+      contents.emplace_back(entry);
+    } // if the type is not directory print it to serial monitor
+  }
+  closedir(d); // finally close the directory
+  return contents;
+}
+// end of get_dir_contents()
+//////////////////////////////////////////////////////////////////////////////////

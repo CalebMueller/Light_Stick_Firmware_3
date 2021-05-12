@@ -29,6 +29,9 @@ void LED_POV(POV_Pattern &pattern); // used with POV patterns to display the
                                     // next column each time the function is
                                     // called
 
+// Pattern patterns vector functions
+void BuildPatternList();
+
 // LED Pattern Functions
 void LED_fill_solid();
 void LED_fill_gradient();

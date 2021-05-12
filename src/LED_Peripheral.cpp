@@ -140,7 +140,7 @@ void LED_accel_rainbow() {
 /////////////////////////////////////////////////////////////////////
 
 void POV_smiley() {
-  static POV_Pattern *smiley = new POV_Pattern("/spiffs/smiley.bmp");
+  static POV_Pattern *smiley = new POV_Pattern("/spiffs/pov/smiley.bmp");
   static NoBlockTimer t;
   if (t.timer(4)) {
     smiley->Run();
@@ -150,7 +150,7 @@ void POV_smiley() {
 ///////////////////////////////////////////////////
 
 void POV_skull() {
-  static POV_Pattern *skull = new POV_Pattern("/spiffs/my_skull.bmp");
+  static POV_Pattern *skull = new POV_Pattern("/spiffs/pov/my_skull.bmp");
   static NoBlockTimer t;
   if (t.timer(4)) {
     skull->Run();
@@ -161,7 +161,7 @@ void POV_skull() {
 
 void POV_red_among_us() {
   static POV_Pattern *red_among_us =
-      new POV_Pattern("/spiffs/red_among_us.bmp");
+      new POV_Pattern("/spiffs/pov/red_among_us.bmp");
   static NoBlockTimer t;
   if (t.timer(4)) {
     red_among_us->Run();
@@ -172,9 +172,9 @@ void POV_red_among_us() {
 
 void POV_red_among_us_ribbon() {
   static POV_Pattern *red_among_us_ribbon =
-      new POV_Pattern("/spiffs/red_among_us_ribbon.bmp");
+      new POV_Pattern("/spiffs/pov/red_among_us_ribbon.bmp");
   static NoBlockTimer t;
-  if (t.timer(4)) {
+  if (t.timer(2)) {
     red_among_us_ribbon->Run();
   }
 }
@@ -182,9 +182,9 @@ void POV_red_among_us_ribbon() {
 ///////////////////////////////////////////////////
 
 void POV_dna() {
-  static POV_Pattern *dna = new POV_Pattern("/spiffs/dna.bmp");
+  static POV_Pattern *dna = new POV_Pattern("/spiffs/pov/dna.bmp");
   static NoBlockTimer t;
-  if (t.timer(4)) {
+  if (t.timer(2)) {
     dna->Run();
   }
 }
