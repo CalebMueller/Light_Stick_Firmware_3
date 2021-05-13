@@ -28,7 +28,6 @@ public:
 private:
   void SetName(const char *fileName); // parses pattern name from fileName
 
-  std::string _name{"empty"};
   uint32_t _width{0};
   uint32_t _height{0};
   std::vector<byte> _img; // Blue-Green-Red member sequence

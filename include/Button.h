@@ -1,6 +1,9 @@
 #ifndef BUTTON_H
 #define BUTTON_H
 
+#include "LED_Peripheral.h"
+#include "Pattern_Handler.h"
+#include "Sleep.h"
 #include <Arduino.h>
 #include <OneButton.h>
 

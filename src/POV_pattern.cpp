@@ -1,9 +1,9 @@
 #include "POV_Pattern.h"
 
 POV_Pattern::POV_Pattern(const char *fileName) {
-  // Constructor reads image data from fileName, assigns it to pixels, and
-  // parses pixels into class member vector _img
-  // example constructor call: POV_Pattern test("/spiffs/example.bmp");
+  // Constructor uses ReadImage to get image data from fileName, reorients it so
+  // the data is vertically sequential in _img
+  // example constructor call: POV_Pattern test("/spiffs/pov/example.bmp");
 
   // temporary container variables for ReadImage
   byte *pixels; // data in BGR pixel order
@@ -12,16 +12,6 @@ POV_Pattern::POV_Pattern(const char *fileName) {
   int32 bytesPerPixel;
 
   ReadImage(fileName, &pixels, &width, &height, &bytesPerPixel);
-
-  // for (int i = 0; i < ((height) * (width) * (bytesPerPixel)); i += 3) {
-  //   Serial.print("(");
-  //   Serial.print(byte(pixels[i]));
-  //   Serial.print(" ");
-  //   Serial.print(byte(pixels[i + 1]));
-  //   Serial.print(" ");
-  //   Serial.print(byte(pixels[i + 2]));
-  //   Serial.print(") ");
-  // }
 
   SetName(fileName);
   _width = width;
@@ -77,3 +67,5 @@ void POV_Pattern::SetName(const char *fileName) {
   std::size_t span = str.length() - s_pos - 4;
   _name = str.substr(s_pos, span);
 }
+// END OF POV_Pattern::SetName()
+///////////////////////////////////////////////////////////////////////////

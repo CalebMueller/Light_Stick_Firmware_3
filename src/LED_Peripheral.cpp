@@ -7,14 +7,6 @@ FASTLED_USING_NAMESPACE
 
 CRGB leds[NUM_LEDS];
 
-int currentPatternNum{0};
-
-// example: PatternArray patternArray = {PatternName};
-PatternArray patternArray = {
-    LED_fill_solid, LED_fill_gradient, LED_accel_rainbow,       POV_smiley,
-    POV_skull,      POV_red_among_us,  POV_red_among_us_ribbon, POV_dna,
-};
-
 ///////////////////////////////////////////////////////////////////////
 ////////////////  UTILITY FUNCTIONS  /////////////////////////////////
 /////////////////////////////////////////////////////////////////////
@@ -60,6 +52,46 @@ void LED_startup_animation() {
 // END OF LED_startup_animation()
 ////////////////////////////////////////////////////
 
+void LED_indicateButtonHold() {
+  // Indicates how long the button has been held to the user to make navigating
+  // hold menu options easier
+
+  // ticks increases as the button is held.  Used determine the color of the
+  // leds corresponding to each of the hold options
+  static int ticks;
+  const int ticksWaitTime = 4;
+  static bool y1st{false}; // first run from reset for yellow
+  static bool r1st{false}; // first run from reset for red
+
+  // Only trigger this function if it hasn't ran in a while
+  static NoBlockTimer firstRunInAWhile;
+  if (firstRunInAWhile.timer(3000)) {
+    FastLED.clear();
+    fill_solid(leds, NUM_LEDS, CRGB::Green);
+    ticks = 400; // Button Hold starts at 750ms
+    y1st = true;
+    r1st = true;
+  }
+
+  if (y1st && ticks >= 750 && ticks <= 1500) {
+    y1st = false;
+    fill_solid(leds, NUM_LEDS, CRGB::Yellow);
+  } else if (r1st && ticks > 1500) {
+    r1st = false;
+    fill_solid(leds, NUM_LEDS, CRGB::Red);
+  }
+
+  // only increment ticks and trigger fadeToBlack according to ticksWaitTime
+  static NoBlockTimer ticksCoolDown;
+  if (ticksCoolDown.timer(ticksWaitTime)) {
+    fadeToBlackBy(leds, NUM_LEDS, 1);
+    ticks += ticksWaitTime;
+  }
+  FastLED.show();
+}
+// END OF LED_confirmGreen()
+////////////////////////////////////////////////////
+
 void LED_cycleBrightness() {
   // Cycles through NUM_BRIGHTNESS_LEVELS settings of brigthness
   // maxBrightness set by MAX_BRIGHTNESS macro at top of header
@@ -72,14 +104,6 @@ void LED_cycleBrightness() {
   FastLED.setBrightness(brightness_value);
 }
 // END OF LED_cyclebrightness()
-///////////////////////////////////////////////////
-
-void LED_nextPattern() {
-  FastLED.clear();
-  currentPatternNum = (currentPatternNum + 1) %
-                      (sizeof(patternArray) / sizeof(patternArray[0]));
-}
-// END OF LED_nextPattern()
 ///////////////////////////////////////////////////
 
 void LED_POV(POV_Pattern &pattern) {
@@ -133,60 +157,4 @@ void LED_accel_rainbow() {
   fill_rainbow(leds, NUM_LEDS, map_val, deltaHue);
 }
 // END OF LED_accel_rainbow()
-///////////////////////////////////////////////////
-
-///////////////////////////////////////////////////////////////////////
-////////////////  POV PATTERN FUNCTIONS  /////////////////////////////
-/////////////////////////////////////////////////////////////////////
-
-void POV_smiley() {
-  static POV_Pattern *smiley = new POV_Pattern("/spiffs/pov/smiley.bmp");
-  static NoBlockTimer t;
-  if (t.timer(4)) {
-    smiley->Run();
-  }
-}
-// END OF POV_smiley()
-///////////////////////////////////////////////////
-
-void POV_skull() {
-  static POV_Pattern *skull = new POV_Pattern("/spiffs/pov/my_skull.bmp");
-  static NoBlockTimer t;
-  if (t.timer(4)) {
-    skull->Run();
-  }
-}
-// END OF POV_skull()
-///////////////////////////////////////////////////
-
-void POV_red_among_us() {
-  static POV_Pattern *red_among_us =
-      new POV_Pattern("/spiffs/pov/red_among_us.bmp");
-  static NoBlockTimer t;
-  if (t.timer(4)) {
-    red_among_us->Run();
-  }
-}
-// END OF POV_red_among_us()
-///////////////////////////////////////////////////
-
-void POV_red_among_us_ribbon() {
-  static POV_Pattern *red_among_us_ribbon =
-      new POV_Pattern("/spiffs/pov/red_among_us_ribbon.bmp");
-  static NoBlockTimer t;
-  if (t.timer(2)) {
-    red_among_us_ribbon->Run();
-  }
-}
-// END OF POV_red_among_us_ribbon()
-///////////////////////////////////////////////////
-
-void POV_dna() {
-  static POV_Pattern *dna = new POV_Pattern("/spiffs/pov/dna.bmp");
-  static NoBlockTimer t;
-  if (t.timer(2)) {
-    dna->Run();
-  }
-}
-// END OF POV_dna()
 ///////////////////////////////////////////////////

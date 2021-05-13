@@ -1,6 +1,10 @@
 #include "Button.h"
-#include "LED_Peripheral.h"
-#include "Sleep.h"
+
+#define DEBOUNCE_TIME 7
+#define DOUBLECLICK_TIME 300
+#define LONGPRESS_TIME 400
+
+#define REGISTER_TOGGLE_AUTOPLAY 750
 
 OneButton btn = OneButton(BUTTON_PIN, // Input pin for the button
                           true,       // Button is active LOW
@@ -8,9 +12,9 @@ OneButton btn = OneButton(BUTTON_PIN, // Input pin for the button
                           );
 
 void button_setup() {
-  btn.setDebounceTicks(7); // debounce trigger threshold
-  btn.setClickTicks(300);  // double click trigger threshold
-  btn.setPressTicks(750);  // duration to trigger a long press
+  btn.setDebounceTicks(DEBOUNCE_TIME); // debounce trigger threshold
+  btn.setClickTicks(DOUBLECLICK_TIME); // double click trigger threshold
+  btn.setPressTicks(LONGPRESS_TIME);   // duration to trigger a long press
 
   // Event attachment
   btn.attachClick(singleClick);
@@ -26,27 +30,33 @@ void button_setup() {
 ////////////////////////////
 
 void singleClick() {
-  Serial.println("singleClick");
-  LED_nextPattern();
+  // Serial.println("singleClick");
+  // LED_nextPattern();
+  patterns.NextPattern();
 }
 
 void doubleClick() {
-  Serial.println("doubleClick");
+  // Serial.println("doubleClick");
   LED_cycleBrightness();
 }
 
 void duringLongPress() {
+  if (btn.getPressedTicks() >= LONGPRESS_TIME) {
+    LED_indicateButtonHold();
+  }
   if (btn.getPressedTicks() >= 2250) {
     sleep();
   }
 }
 
 void longPress() {
-  if ((btn.getPressedTicks() >= 750) && (btn.getPressedTicks() < 1500)) {
-    Serial.println("shortHold");
+  if ((btn.getPressedTicks() >= REGISTER_TOGGLE_AUTOPLAY) &&
+      (btn.getPressedTicks() < 1500)) {
+    patterns.ToggleAutoPlay();
+    // Serial.println("shortHold");
   }
   if ((btn.getPressedTicks() >= 1500) && (btn.getPressedTicks() < 1800)) {
-    Serial.println("mediumHold");
+    // Serial.println("mediumHold");
   }
   /*
   if (btn.getPressedTicks() >= 3000) {

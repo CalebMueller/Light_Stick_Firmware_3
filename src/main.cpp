@@ -24,10 +24,7 @@ Pin	        Net
 #include "Sleep.h"
 #include <Arduino.h>
 
-#include "POV_pattern.h"
-
-#define FILEPATH "/spiffs"
-#define FILEPATH_POV "/spiffs/pov"
+#include "Pattern_Handler.h"
 
 void setup() {
   Serial.begin(115200);
@@ -41,12 +38,20 @@ void setup() {
   mpu_setup(8, 500, 44); // setup last because mpu chip is slow to power on
   esp_spiffs_enable();
 
-} // END OF setup()
+  patterns.BuildList();
+  patterns.PrintListInfo();
+
+  Serial.printf("Battery: %d\n", poll_battery());
+
+} // end of setup()
 
 void loop() {
 
   btn.tick();
 
-  patternArray[currentPatternNum]();
-  LED_show();
-}
+  static NoBlockTimer t;
+  if (t.timer(4) && !btn.isLongPressed()) {
+    patterns.Run();
+  }
+
+} // end of loop()
