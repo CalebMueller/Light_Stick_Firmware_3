@@ -26,6 +26,11 @@ void LED_startup_animation(); // display sequence played during device setup
 
 void LED_indicateButtonHold(); // flashes green to confirm an action
 
+void LED_showBatteryPercent(int reading); // takes an input from
+                                          // get_battery_voltage and displays
+                                          // the battery percent using leds
+int LED_battVoltsToNUM_LEDS(int reading);
+
 void LED_cycleBrightness(); // cycles through NUM_BRIGHTNESS_LEVELS of
                             // brightness settings, with MAX_BRIGHTNESS being
                             // the brightest allowable

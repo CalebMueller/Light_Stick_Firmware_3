@@ -34,19 +34,20 @@ void LED_show() { FastLED.show(); }
 ///////////////////////////////////////////////////
 
 void LED_startup_animation() {
+  FastLED.clear();
   for (int i = 0; i < NUM_LEDS; i++) {
     leds[i] = CHSV(i * (255 / NUM_LEDS), 255, 255);
     FastLED.show();
-    delay(10);
+    delay(7);
   }
-  delay(500);
+  delay(250);
   fill_solid(leds, NUM_LEDS, CRGB::Green);
   FastLED.show();
-  delay(500);
+  delay(250);
   for (int i = NUM_LEDS; i >= 0; i--) {
     leds[i] = CRGB::Black;
     FastLED.show();
-    delay(10);
+    delay(7);
   }
 }
 // END OF LED_startup_animation()
@@ -91,6 +92,50 @@ void LED_indicateButtonHold() {
 }
 // END OF LED_confirmGreen()
 ////////////////////////////////////////////////////
+
+void LED_showBatteryPercent(int reading) {
+  // takes reading from get_battery_voltage and animates the battery percent
+  // Start color is red, endColor goes up to green for fully charged depending
+  // on battery voltage
+  // Pulses brightness while showing for added effect
+  const int showTime = 800;
+  static int ledsToLight = LED_battVoltsToNUM_LEDS(reading);
+
+  FastLED.clear();
+  // end color is green (96) when max, and red (0) when min
+  byte endColor = 96 * ledsToLight / NUM_LEDS;
+
+  // fill_gradient(leds, ledsToLight, CHSV(0, 255, 255), CHSV(endColor, 255,
+  // 255),
+  //               FORWARD_HUES);
+  // FastLED.show();
+
+  NoBlockTimer pulseLoop;
+  while (!pulseLoop.timer(showTime)) {
+    byte sineBrightness = beatsin8(72, 255 / 2, 255, 0, 0);
+    fill_gradient(leds, ledsToLight, CHSV(0, 255, sineBrightness),
+                  CHSV(endColor, 255, sineBrightness), FORWARD_HUES);
+    FastLED.show();
+  }
+  delay(showTime);
+}
+
+int LED_battVoltsToNUM_LEDS(int reading) {
+  // takes reading and maps it to NUM_LEDS
+  const int minReading = 3200;
+  const int maxReading = 4200;
+  const int minLeds = 1;
+  const int maxLeds = NUM_LEDS;
+  // map reading to the range of NUM_LEDS
+  int numLedsToLight = map(reading, minReading, maxReading, minLeds, maxLeds);
+  // handle cases that exceed intended range
+  if (numLedsToLight > NUM_LEDS) {
+    numLedsToLight = NUM_LEDS;
+  } else if (numLedsToLight <= 0) {
+    numLedsToLight = 1;
+  }
+  return numLedsToLight;
+}
 
 void LED_cycleBrightness() {
   // Cycles through NUM_BRIGHTNESS_LEVELS settings of brigthness

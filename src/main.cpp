@@ -33,15 +33,17 @@ void setup() {
   sleep_setup();
   LED_Peripheral_setup();
   button_setup();
+
   LED_cycleBrightness();
+  check_for_low_battery();
   LED_startup_animation();
+  LED_showBatteryPercent(get_battery_voltage());
+
   mpu_setup(8, 500, 44); // setup last because mpu chip is slow to power on
   esp_spiffs_enable();
 
   patterns.BuildList();
-  patterns.PrintListInfo();
-
-  Serial.printf("Battery: %d\n", poll_battery());
+  // patterns.PrintListInfo();
 
 } // end of setup()
 
@@ -52,6 +54,11 @@ void loop() {
   static NoBlockTimer t;
   if (t.timer(4) && !btn.isLongPressed()) {
     patterns.Run();
+  }
+
+  static NoBlockTimer low_batt_check;
+  if (low_batt_check.timer(10000)) {
+    check_for_low_battery();
   }
 
 } // end of loop()
